@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { margin: 5px; padding: 10px 15px; cursor: pointer; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Application Status Test</h1>
+    
+    <div class="test-section info">
+        <h3>Backend Status</h3>
+        <p>Server should be running on: <code>http://localhost:4000</code></p>
+        <p>Frontend should be running on: <code>http://localhost:3000</code></p>
+        <button onclick="testBackend()">Test Backend Connection</button>
+        <button onclick="testProducts()">Test Products API</button>
+        <button onclick="testLogin()">Test Admin Login</button>
+    </div>
+
+    <div class="test-section info">
+        <h3>Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <div class="test-section info">
+        <h3>Quick Links</h3>
+        <a href="http://localhost:3000" target="_blank">Open Frontend</a> | 
+        <a href="http://localhost:4000/api/products" target="_blank">Test Products API</a>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+
+        async function testBackend() {
+            try {
+                const response = await fetch('http://localhost:4000/');
+                const data = await response.json();
+                addResult(`Backend connected: ${JSON.stringify(data)}`, 'success');
+            } catch (error) {
+                addResult(`Backend connection failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testProducts() {
+            try {
+                const response = await fetch('http://localhost:4000/api/products');
+                const data = await response.json();
+                addResult(`Products API working: ${data.length} products found`, 'success');
+            } catch (error) {
+                addResult(`Products API failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:4000/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        identifier: 'admin@example.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(`Admin login successful: ${data.name} (${data.email})`, 'success');
+                } else {
+                    const error = await response.json();
+                    addResult(`Admin login failed: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                addResult(`Login test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            addResult('Page loaded. Click buttons to test application components.');
+            testBackend();
+        };
+    </script>
+</body>
+</html>
