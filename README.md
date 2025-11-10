@@ -43,7 +43,7 @@ A modern, full-stack e-commerce application for jewelry sales with secure authen
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone [<repository-url>](https://github.com/johnedubasxd11/Merchant-Jewelry-Shop.git)
    cd Merchant-Jewelry-Shop
    ```
 
@@ -71,7 +71,7 @@ A modern, full-stack e-commerce application for jewelry sales with secure authen
    ```env
    PORT=4000
    MONGO_URI=mongodb://localhost:27017/jewelry_store
-   JWT_SECRET=your-secure-jwt-secret-at-least-32-characters-long
+   JWT_SECRET=johnedubasxd09911527545-0313
    NODE_ENV=development
    ```
 
