@@ -1,9 +1,11 @@
 
 import React from 'react';
 import { useAppState } from '../state/AppState.js';
+import { useToast } from '../components/ToastProvider.js';
 
 const ConfirmationView = () => {
   const { lastPlacedOrder } = useAppState();
+  const toast = useToast();
 
   if (!lastPlacedOrder) {
     return (
@@ -36,13 +38,35 @@ const ConfirmationView = () => {
             React.createElement('p', { className: "font-bold text-xl" }, `$${lastPlacedOrder.total.toLocaleString()}`)
           ),
           // Payment details (if available)
-          (lastPlacedOrder.payment || lastPlacedOrder.deliveryFee) && React.createElement('div', { className: "flex justify-between items-center mb-4 text-sm text-gray-700" },
-            React.createElement('div', null,
-              React.createElement('p', { className: "font-medium" }, 'Payment method:'),
-              React.createElement('p', { className: "text-gray-600" }, `${(lastPlacedOrder.payment && lastPlacedOrder.payment.method) || lastPlacedOrder.method || 'N/A'}`)
+          (lastPlacedOrder.payment || lastPlacedOrder.deliveryFee) && React.createElement('div', { className: "mb-4 text-sm text-gray-700" },
+            React.createElement('div', { className: 'flex justify-between items-center' },
+              React.createElement('div', null,
+                React.createElement('p', { className: "font-medium" }, 'Payment method:'),
+                React.createElement('p', { className: "text-gray-600" }, `${(lastPlacedOrder.payment && lastPlacedOrder.payment.method) || lastPlacedOrder.method || 'N/A'}`)
+              ),
+              React.createElement('div', { className: "text-right" },
+                lastPlacedOrder.deliveryFee ? React.createElement('p', { className: "font-medium" }, `Delivery / COD Fee: $${lastPlacedOrder.deliveryFee}`) : null
+              )
             ),
-            React.createElement('div', { className: "text-right" },
-              lastPlacedOrder.deliveryFee ? React.createElement('p', { className: "font-medium" }, `Delivery / COD Fee: $${lastPlacedOrder.deliveryFee}`) : null
+            // show persisted paymentDetails if present
+            lastPlacedOrder.paymentDetails && React.createElement('div', { className: 'mt-3 p-3 bg-white border rounded text-sm flex justify-between items-start' },
+              React.createElement('div', null,
+                React.createElement('p', { className: 'font-medium' }, 'Payment instructions'),
+                lastPlacedOrder.paymentDetails.bank && React.createElement('p', { className: 'text-gray-700' }, `Bank: ${lastPlacedOrder.paymentDetails.bank}`),
+                lastPlacedOrder.paymentDetails.provider && React.createElement('p', { className: 'text-gray-700' }, `Provider: ${lastPlacedOrder.paymentDetails.provider}`),
+                lastPlacedOrder.paymentDetails.accountName && React.createElement('p', { className: 'text-gray-700' }, `Account name: ${lastPlacedOrder.paymentDetails.accountName}`),
+                (lastPlacedOrder.paymentDetails.accountNumber || lastPlacedOrder.paymentDetails.mobile || lastPlacedOrder.paymentDetails.contact) && React.createElement('p', { className: 'text-gray-700' }, `Account / Contact: ${lastPlacedOrder.paymentDetails.accountNumber || lastPlacedOrder.paymentDetails.mobile || lastPlacedOrder.paymentDetails.contact}`),
+                lastPlacedOrder.paymentDetails.note && React.createElement('p', { className: 'text-xs text-gray-500 mt-1' }, lastPlacedOrder.paymentDetails.note)
+              ),
+              React.createElement('div', null,
+                (lastPlacedOrder.paymentDetails.accountNumber || lastPlacedOrder.paymentDetails.mobile || lastPlacedOrder.paymentDetails.contact) ? React.createElement('button', {
+                  onClick: () => {
+                    const text = lastPlacedOrder.paymentDetails.accountNumber || lastPlacedOrder.paymentDetails.mobile || lastPlacedOrder.paymentDetails.contact;
+                    try { navigator.clipboard.writeText(String(text)).then(()=>toast.showToast('Copied to clipboard', { type: 'success' })).catch(()=>toast.showToast('Copy failed', { type: 'error' })); } catch (_) { toast.showToast('Copy failed', { type: 'error' }); }
+                  },
+                  className: 'inline-block bg-gray-200 text-gray-800 py-1 px-3 rounded'
+                }, 'Copy') : null
+              )
             )
           ),
           React.createElement('div', { className: "space-y-4" },

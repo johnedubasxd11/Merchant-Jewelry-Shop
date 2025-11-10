@@ -82,6 +82,20 @@ const CheckoutView = () => {
     setError(null);
     try {
       const paymentInfo = { method: selected };
+      // attach merchant account/instruction details for bank/digital methods
+      const MERCHANT_ACCOUNTS = {
+        // Use the same provided number for all demo payment instructions
+        mastercard: { type: 'card', bank: 'Global Bank', accountName: 'Merchant Jewelry Co.', accountNumber: '0991-152-7545', note: 'Use card payment gateway and reference your email.' },
+        visa: { type: 'card', bank: 'Global Bank', accountName: 'Merchant Jewelry Co.', accountNumber: '0991-152-7545', note: 'Use card payment gateway and reference your email.' },
+        gcash: { type: 'wallet', provider: 'Gcash', accountName: 'Merchant Jewelry Co.', mobile: '0991-152-7545', note: 'Send payment via GCash to this number and include your order id as reference.' },
+        paymaya: { type: 'wallet', provider: 'PayMaya', accountName: 'Merchant Jewelry Co.', mobile: '0991-152-7545', note: 'Send payment via PayMaya to this number and include your order id as reference.' },
+        paypal: { type: 'wallet', provider: 'PayPal', accountName: 'Merchant Jewelry Co.', contact: '0991-152-7545', note: 'Send payment via PayPal and include your order id as reference.' }
+      };
+
+      if (MERCHANT_ACCOUNTS[selected]) {
+        paymentInfo.details = MERCHANT_ACCOUNTS[selected];
+      }
+
       if (selected === 'cod') paymentInfo.deliveryFee = codFee;
       const order = await placeOrder(paymentInfo);
       if (order) {
@@ -134,6 +148,17 @@ const CheckoutView = () => {
                 React.createElement('button', { onClick: () => handleSelect('mastercard'), className: `w-full text-left p-3 rounded-md border ${selected === 'mastercard' ? 'border-brand-dark bg-white' : 'border-gray-200 bg-white'}` }, React.createElement(PaymentLogo, { type: 'mastercard' })),
                 React.createElement('button', { onClick: () => handleSelect('visa'), className: `w-full text-left p-3 rounded-md border ${selected === 'visa' ? 'border-brand-dark bg-white' : 'border-gray-200 bg-white'}` }, React.createElement(PaymentLogo, { type: 'visa' }))
               )
+              // show merchant account info when a bank/card method is selected
+              (selected === 'mastercard' || selected === 'visa') && React.createElement('div', { className: 'mt-3 p-3 bg-white border rounded text-sm' },
+                React.createElement('p', { className: 'font-medium' }, 'Account information for card transfers'),
+                React.createElement('p', { className: 'text-gray-700 mt-2' }, `${selected === 'mastercard' ? 'Bank: Global Bank' : 'Bank: Global Bank'}`),
+                React.createElement('p', { className: 'text-gray-700' }, `Account name: Merchant Jewelry Co.`),
+                React.createElement('p', { className: 'text-gray-700' }, `Account / Card: 0991-152-7545`),
+                React.createElement('p', { className: 'text-xs text-gray-500 mt-2' }, 'Please use your bank app or card gateway to make the payment and include your order id or email as reference.'),
+                React.createElement('div', { className: 'mt-2 flex gap-2' },
+                  React.createElement('button', { onClick: () => { navigator.clipboard.writeText('0991-152-7545').then(()=>alert('Account copied to clipboard')).catch(()=>{}); }, className: 'inline-block bg-gray-200 text-gray-800 py-1 px-3 rounded' }, 'Copy Account')
+                )
+              ),
             ),
             React.createElement('div', { className: 'mt-6' },
               React.createElement('h3', { className: 'font-semibold mb-2' }, 'Digital bank'),
@@ -142,6 +167,33 @@ const CheckoutView = () => {
                 React.createElement('button', { onClick: () => handleSelect('paymaya'), className: `w-full text-left p-3 rounded-md border ${selected === 'paymaya' ? 'border-brand-dark bg-white' : 'border-gray-200 bg-white'}` }, React.createElement(PaymentLogo, { type: 'paymaya' })),
                 React.createElement('button', { onClick: () => handleSelect('paypal'), className: `w-full text-left p-3 rounded-md border ${selected === 'paypal' ? 'border-brand-dark bg-white' : 'border-gray-200 bg-white'}` }, React.createElement(PaymentLogo, { type: 'paypal' }))
               )
+              // show merchant account info for digital banks
+              (selected === 'gcash' || selected === 'paymaya' || selected === 'paypal') && React.createElement('div', { className: 'mt-3 p-3 bg-white border rounded text-sm' },
+                React.createElement('p', { className: 'font-medium' }, 'Account information for digital payments'),
+                selected === 'gcash' && React.createElement(React.Fragment, null,
+                  React.createElement('p', { className: 'text-gray-700 mt-2' }, 'Provider: GCash'),
+                  React.createElement('p', { className: 'text-gray-700' }, 'Mobile / Account: 0991-152-7545'),
+                  React.createElement('p', { className: 'text-gray-700' }, 'Account name: Merchant Jewelry Co.'),
+                  React.createElement('div', { className: 'mt-2 flex gap-2' },
+                    React.createElement('button', { onClick: () => { navigator.clipboard.writeText('0991-152-7545').then(()=>alert('Number copied to clipboard')).catch(()=>{}); }, className: 'inline-block bg-gray-200 text-gray-800 py-1 px-3 rounded' }, 'Copy Number')
+                  )
+                ),
+                selected === 'paymaya' && React.createElement(React.Fragment, null,
+                  React.createElement('p', { className: 'text-gray-700 mt-2' }, 'Provider: PayMaya'),
+                  React.createElement('p', { className: 'text-gray-700' }, 'Mobile / Account: 0991-152-7545'),
+                  React.createElement('p', { className: 'text-gray-700' }, 'Account name: Merchant Jewelry Co.'),
+                  React.createElement('div', { className: 'mt-2 flex gap-2' },
+                    React.createElement('button', { onClick: () => { navigator.clipboard.writeText('0991-152-7545').then(()=>alert('Number copied to clipboard')).catch(()=>{}); }, className: 'inline-block bg-gray-200 text-gray-800 py-1 px-3 rounded' }, 'Copy Number')
+                  )
+                ),
+                selected === 'paypal' && React.createElement(React.Fragment, null,
+                  React.createElement('p', { className: 'text-gray-700 mt-2' }, 'Provider: PayPal'),
+                  React.createElement('p', { className: 'text-gray-700' }, 'Contact: 0991-152-7545'),
+                  React.createElement('div', { className: 'mt-2 flex gap-2' },
+                    React.createElement('button', { onClick: () => { navigator.clipboard.writeText('0991-152-7545').then(()=>alert('Contact copied to clipboard')).catch(()=>{}); }, className: 'inline-block bg-gray-200 text-gray-800 py-1 px-3 rounded' }, 'Copy Contact')
+                  )
+                )
+              ),
             ),
             React.createElement('div', { className: 'mt-6' },
               React.createElement('h3', { className: 'font-semibold mb-2' }, 'Other'),

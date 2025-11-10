@@ -88,6 +88,7 @@ router.post('/', protect, validateOrder, async (req, res) => {
     };
   // Accept payment.method or paymentMethod, and optional deliveryFee
   const paymentMethod = (body.payment && body.payment.method) || body.paymentMethod || 'unknown';
+  const paymentDetails = (body.payment && body.payment.details) || body.paymentDetails || null;
   const itemsPrice = body.itemsPrice ?? body.totalAmount ?? orderItems.reduce((sum, i) => sum + (i.price * i.qty), 0);
   const taxPrice = body.taxPrice ?? 0;
   const shippingPrice = body.shippingPrice ?? 0;
@@ -104,6 +105,7 @@ router.post('/', protect, validateOrder, async (req, res) => {
       user: req.userId,
       shippingAddress,
       paymentMethod,
+      paymentDetails,
       itemsPrice,
       taxPrice,
       shippingPrice,
@@ -117,6 +119,7 @@ router.post('/', protect, validateOrder, async (req, res) => {
       orderItems: createdOrder.orderItems,
       shippingAddress: createdOrder.shippingAddress,
   paymentMethod: createdOrder.paymentMethod,
+  paymentDetails: createdOrder.paymentDetails || null,
   payment: { method: createdOrder.paymentMethod },
   deliveryFee: createdOrder.deliveryFee,
       itemsPrice: createdOrder.itemsPrice,
@@ -152,6 +155,7 @@ router.get('/:id', protect, async (req, res) => {
         orderItems: order.orderItems,
         shippingAddress: order.shippingAddress,
         paymentMethod: order.paymentMethod,
+    paymentDetails: order.paymentDetails || null,
     payment: { method: order.paymentMethod },
     deliveryFee: order.deliveryFee || 0,
         itemsPrice: order.itemsPrice,
@@ -194,6 +198,62 @@ router.put('/:id/pay', protect, async (req, res) => {
     } else {
       res.status(404).json({ message: 'Order not found' });
     }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+// Cancel an order (user can cancel their own order if not paid/delivered)
+router.put('/:id/cancel', protect, async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Check ownership
+    if (order.user.toString() !== req.userId.toString()) {
+      return res.status(403).json({ message: 'Not allowed to cancel this order' });
+    }
+
+    // Prevent cancel after payment or delivery
+    if (order.isPaid) {
+      return res.status(400).json({ message: 'Cannot cancel a paid order' });
+    }
+    if (order.isDelivered) {
+      return res.status(400).json({ message: 'Cannot cancel a delivered order' });
+    }
+
+    order.isCanceled = true;
+    order.canceledAt = Date.now();
+
+    const updated = await order.save();
+
+    const normalized = {
+      id: updated._id,
+      orderItems: updated.orderItems,
+      shippingAddress: updated.shippingAddress,
+      paymentMethod: updated.paymentMethod,
+      paymentDetails: updated.paymentDetails || null,
+      payment: { method: updated.paymentMethod },
+      deliveryFee: updated.deliveryFee || 0,
+      itemsPrice: updated.itemsPrice,
+      taxPrice: updated.taxPrice,
+      shippingPrice: updated.shippingPrice,
+      totalPrice: updated.totalPrice,
+      isPaid: updated.isPaid,
+      paidAt: updated.paidAt,
+      isDelivered: updated.isDelivered,
+      deliveredAt: updated.deliveredAt,
+      isCanceled: updated.isCanceled,
+      canceledAt: updated.canceledAt,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    };
+
+    res.json({ order: normalized });
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
   }

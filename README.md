@@ -1,6 +1,4 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+
 
 # Elegant Jewelry Store
 
@@ -46,7 +44,7 @@ A modern, full-stack e-commerce application for jewelry sales with secure authen
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd jewelry-store
+   cd Merchant-Jewelry-Shop
    ```
 
 2. **Install dependencies**
@@ -61,16 +59,16 @@ A modern, full-stack e-commerce application for jewelry sales with secure authen
    ```
 
 3. **Environment Setup**
-   
-   Create `.env` files for both frontend and backend:
-   
-   **Frontend (.env)**
-   ```
+
+   Create `.env` files for the frontend (optional) and backend. The backend `.env` should live in the `server/` folder.
+
+   **Frontend (optional `./.env`)**
+   ```env
    VITE_API_URL=http://localhost:4000/api
    ```
-   
-   **Backend (server/.env)**
-   ```
+
+   **Backend (`server/.env`)**
+   ```env
    PORT=4000
    MONGO_URI=mongodb://localhost:27017/jewelry_store
    JWT_SECRET=your-secure-jwt-secret-at-least-32-characters-long
@@ -89,7 +87,7 @@ A modern, full-stack e-commerce application for jewelry sales with secure authen
    ```
 
 5. **Access the application**
-   - Frontend: http://localhost:3000
+   - Frontend: open the URL printed by Vite after `npm run dev` (commonly http://localhost:5173 or another available port)
    - Backend API: http://localhost:4000/api
 
 ## 📋 Available Scripts
@@ -181,26 +179,25 @@ npm run test:coverage   # With coverage report
 - **Frontend**: State management, API services, components
 - **Integration**: API endpoint testing with database
 
-## 📁 Project Structure
+## 📁 Project Structure (actual layout)
+
+This project keeps the frontend files at the repository root (no nested `src/` build folder). Key files and folders in this repository are:
 
 ```
-jewelry-store/
-├── src/                    # Frontend source
-│   ├── components/         # React components
-│   ├── views/             # Page components
-│   ├── services/          # API services
-│   ├── state/             # State management
-│   └── test/              # Frontend tests
-├── server/                 # Backend source
-│   ├── config/            # Configuration files
-│   ├── controllers/       # Route controllers
-│   ├── middleware/        # Custom middleware
-│   ├── models/            # Database models
-│   ├── routes/            # API routes
-│   ├── tests/             # Backend tests
-│   └── utils/             # Utility functions
-├── public/                 # Static assets
-└── data/                   # Fallback data files
+Merchant-Jewelry-Shop/
+├── App.js, App.tsx, index.js, index.tsx      # Frontend entry and root app files
+├── components/                              # React components (Header, Footer, etc.)
+├── views/                                   # Page components (HomeView, CartView, CheckoutView...)
+├── services/                                # API client (services/api.js)
+├── state/                                   # AppState context
+├── data/                                    # Static fallback data (products)
+├── public/                                  # Static assets
+├── server/                                  # Backend source (Express + Mongoose)
+│   ├── routes/
+│   ├── models/
+│   └── ...
+├── package.json                              # frontend scripts & deps
+└── server/package.json                       # backend scripts & deps
 ```
 
 ## 🔒 Security Features
@@ -293,3 +290,4 @@ For issues and questions:
 - [ ] Advanced search and filtering
 - [ ] Multi-language support
 - [ ] Mobile app (React Native)
+

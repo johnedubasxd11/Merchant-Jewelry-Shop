@@ -180,6 +180,29 @@ export const updateOrderToPaid = async (id, paymentResult) => {
   }
 };
 
+// Cancel an order
+export const cancelOrder = async (id) => {
+  try {
+    return await tryFetch(`${API_URL}/orders/${id}/cancel`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (err) {
+    // If backend unreachable, try local fallback: mark local order as canceled
+    console.warn('cancelOrder: backend unreachable, updating local orders', err.message);
+    const ordersKey = 'local_orders';
+    const existing = JSON.parse(localStorage.getItem(ordersKey) || '[]');
+    const idx = existing.findIndex(o => o.id === id);
+    if (idx >= 0) {
+      existing[idx].isCanceled = true;
+      existing[idx].canceledAt = new Date().toISOString();
+      localStorage.setItem(ordersKey, JSON.stringify(existing));
+      return existing[idx];
+    }
+    throw err;
+  }
+};
+
 export const getUserData = async (userId) => {
   try {
     const storedData = localStorage.getItem(`userData_${userId}`);

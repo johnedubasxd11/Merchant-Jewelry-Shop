@@ -51,6 +51,9 @@ const App = () => {
         newRoute = { view: 'signup' };
       } else if (path === '/confirmation') {
         newRoute = { view: 'confirmation', searchQuery };
+      } else if (path === '/checkout') {
+        // Recognize the checkout hash so the CheckoutView is rendered
+        newRoute = { view: 'checkout', searchQuery };
       } else if (path === '/contact') {
         newRoute = { view: 'contact' };
       } else if (path === '/wishlist') {

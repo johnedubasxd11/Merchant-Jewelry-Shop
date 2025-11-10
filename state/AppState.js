@@ -259,6 +259,24 @@ export const AppStateProvider = ({ children }) => {
     }
   };
 
+  // Cancel an order by id. Will call backend and update local orders state.
+  const cancelOrder = async (orderId) => {
+    try {
+      const res = await api.cancelOrder(orderId);
+      // backend returns { order: {...} } or the updated order
+      const updated = res.order || res;
+      setOrders(prev => prev.map(o => (String(o.id) === String(updated.id) ? ({
+        ...o,
+        isCanceled: updated.isCanceled ?? true,
+        canceledAt: updated.canceledAt || new Date().toISOString()
+      }) : o)));
+      return updated;
+    } catch (err) {
+      console.error('Failed to cancel order', err);
+      throw err;
+    }
+  };
+
   const updateUserProfile = (profile) => {
     setUserProfile(profile);
   };
@@ -279,6 +297,7 @@ export const AppStateProvider = ({ children }) => {
     currentUser, 
     isAuthenticated,
     isLoading,
+    cancelOrder,
     login,
     register,
     socialLogin,

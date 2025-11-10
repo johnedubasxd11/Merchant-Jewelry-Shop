@@ -29,6 +29,11 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // Optional raw payment details (e.g., merchant account info or wallet details)
+  paymentDetails: {
+    type: mongoose.Schema.Types.Mixed,
+    required: false
+  },
   paymentResult: {
     id: { type: String },
     status: { type: String },
@@ -62,6 +67,15 @@ const orderSchema = new mongoose.Schema({
     default: false
   },
   paidAt: {
+    type: Date
+  },
+  // Whether the order was cancelled by the user
+  isCanceled: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  canceledAt: {
     type: Date
   },
   isDelivered: {
