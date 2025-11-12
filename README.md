@@ -20,7 +20,7 @@ A modern, full-stack e-commerce application for jewelry sales with secure authen
 
 ### Frontend (React + Vite)
 - **Framework**: React 19 with modern hooks and context
-- **Build Tool**: Vite for fast development and building
+- **Build Tool**: Vite for fast development and building 
 - **State Management**: React Context for global state
 - **Testing**: Vitest with React Testing Library
 - **Styling**: CSS modules and responsive design

@@ -47,7 +47,7 @@ const PaymentLogo = ({ type }) => {
 };
 
 const CheckoutView = () => {
-  const { cart, placeOrder } = useAppState();
+  const { cart, createOrder } = useAppState();
   const [selected, setSelected] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -92,15 +92,16 @@ const CheckoutView = () => {
         paypal: { type: 'wallet', provider: 'PayPal', accountName: 'Merchant Jewelry Co.', contact: '0991-152-7545', note: 'Send payment via PayPal and include your order id as reference.' }
       };
 
-      if (MERCHANT_ACCOUNTS[selected]) {
+     if (MERCHANT_ACCOUNTS[selected]) {
         paymentInfo.details = MERCHANT_ACCOUNTS[selected];
       }
 
       if (selected === 'cod') paymentInfo.deliveryFee = codFee;
-      const order = await placeOrder(paymentInfo);
+      const order = await createOrder(paymentInfo);
       if (order) {
         toast.showToast('Order placed successfully', { type: 'success' });
         window.location.hash = '#/confirmation';
+
       } else {
         const msg = 'Failed to place order';
         setError(msg);
