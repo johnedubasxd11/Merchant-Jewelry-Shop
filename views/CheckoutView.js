@@ -47,7 +47,7 @@ const PaymentLogo = ({ type }) => {
 };
 
 const CheckoutView = () => {
-  const { cart, createOrder } = useAppState();
+  const { cart, placeOrder } = useAppState();
   const [selected, setSelected] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -97,7 +97,7 @@ const CheckoutView = () => {
       }
 
       if (selected === 'cod') paymentInfo.deliveryFee = codFee;
-      const order = await createOrder(paymentInfo);
+  const order = await placeOrder(paymentInfo);
       if (order) {
         toast.showToast('Order placed successfully', { type: 'success' });
         window.location.hash = '#/confirmation';
