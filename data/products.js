@@ -68,7 +68,7 @@ export const products = [
     name: 'Aether Signet Ring',
     price: 850,
     category: 'Rings',
-    imageUrl: 'https://picsum.photos/seed/onyx-signet-ring/800/800',
+    imageUrl: ,
     details: {
       material: 'Solid 18k White Gold',
       gemstone: 'Black Onyx',
